@@ -1,13 +1,14 @@
 import Submission from '../models/Submission.js';
 import Verdict from '../models/Verdict.js';
 import Appeal from '../models/Appeal.js';
-import User from '../models/User.js';
 
 export const getAnalytics = async (req, res, next) => {
   try {
-    const { days = 30 } = req.query;
+    const rawDays = Number(req.query.days);
+    const days = !isNaN(rawDays) && rawDays > 0 ? rawDays : 30;
+
     const since = new Date();
-    since.setDate(since.getDate() - Number(days));
+    since.setDate(since.getDate() - days);
 
     const [
       submissionVolume,
@@ -31,15 +32,16 @@ export const getAnalytics = async (req, res, next) => {
         { $project: { date: '$_id', count: 1, _id: 0 } },
       ]),
 
-      // 2. Verdict distribution by outcome
+      // 2. Verdict distribution by outcome (scoped to time window)
       Submission.aggregate([
-        { $match: { overallOutcome: { $ne: 'Pending' } } },
+        { $match: { overallOutcome: { $ne: 'Pending' }, createdAt: { $gte: since } } },
         { $group: { _id: '$overallOutcome', count: { $sum: 1 } } },
         { $project: { outcome: '$_id', count: 1, _id: 0 } },
       ]),
 
-      // 3. Verdict distribution by category (only triggered detections)
+      // 3. Verdict distribution by category — triggered detections only (scoped to time window)
       Verdict.aggregate([
+        { $match: { createdAt: { $gte: since } } },
         { $unwind: '$categoryBreakdown' },
         { $match: { 'categoryBreakdown.triggered': true } },
         { $group: { _id: '$categoryBreakdown.category', count: { $sum: 1 } } },
@@ -47,8 +49,9 @@ export const getAnalytics = async (req, res, next) => {
         { $project: { category: '$_id', count: 1, _id: 0 } },
       ]),
 
-      // 4. Appeal stats
+      // 4. Appeal stats (scoped to time window)
       Appeal.aggregate([
+        { $match: { createdAt: { $gte: since } } },
         {
           $group: {
             _id: null,
@@ -69,15 +72,21 @@ export const getAnalytics = async (req, res, next) => {
               $cond: [
                 { $eq: ['$total', 0] },
                 0,
-                { $multiply: [{ $divide: [{ $add: ['$accepted', '$rejected'] }, '$total'] }, 100] },
+                {
+                  $multiply: [
+                    { $divide: [{ $add: ['$accepted', '$rejected'] }, '$total'] },
+                    100,
+                  ],
+                },
               ],
             },
           },
         },
       ]),
 
-      // 5. Top 10 users by submission count
+      // 5. Top 10 users by submission count (scoped to time window)
       Submission.aggregate([
+        { $match: { createdAt: { $gte: since } } },
         { $group: { _id: '$user', submissionCount: { $sum: 1 } } },
         { $sort: { submissionCount: -1 } },
         { $limit: 10 },
@@ -101,9 +110,14 @@ export const getAnalytics = async (req, res, next) => {
         },
       ]),
 
-      // 6. Top 10 users by violation count (Flagged or Blocked submissions)
+      // 6. Top 10 users by violation count (scoped to time window)
       Submission.aggregate([
-        { $match: { overallOutcome: { $in: ['Flagged for Review', 'Blocked'] } } },
+        {
+          $match: {
+            overallOutcome: { $in: ['Flagged for Review', 'Blocked'] },
+            createdAt: { $gte: since },
+          },
+        },
         { $group: { _id: '$user', violationCount: { $sum: 1 } } },
         { $sort: { violationCount: -1 } },
         { $limit: 10 },
@@ -129,6 +143,7 @@ export const getAnalytics = async (req, res, next) => {
     ]);
 
     res.json({
+      timeWindow: { days, since },
       submissionVolume,
       verdictByOutcome,
       verdictByCategory,

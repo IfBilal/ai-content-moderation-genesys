@@ -2,6 +2,10 @@ import User from '../models/User.js';
 import Policy, { CATEGORIES } from '../models/Policy.js';
 
 export const seedAdmin = async () => {
+  if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
+    throw new Error('ADMIN_EMAIL and ADMIN_PASSWORD must be set in environment variables');
+  }
+
   const exists = await User.findOne({ role: 'admin' });
   if (exists) return;
 

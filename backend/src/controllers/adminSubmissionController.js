@@ -70,6 +70,9 @@ export const overrideVerdict = async (req, res, next) => {
     submission.appealEligible = ['Flagged for Review', 'Blocked'].includes(outcome);
     await submission.save();
 
+    // Also update all individual verdict documents so detail view stays consistent
+    await Verdict.updateMany({ submission: submission._id }, { outcome });
+
     res.json(submission);
   } catch (err) {
     next(err);

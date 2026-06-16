@@ -1,5 +1,6 @@
 import Appeal from '../models/Appeal.js';
 import Submission from '../models/Submission.js';
+import Verdict from '../models/Verdict.js';
 
 export const getAppeals = async (req, res, next) => {
   try {
@@ -16,10 +17,7 @@ export const getAppeals = async (req, res, next) => {
     const [appeals, total] = await Promise.all([
       Appeal.find(filter)
         .populate({ path: 'user', select: 'name email' })
-        .populate({
-          path: 'submission',
-          select: 'overallOutcome triggeredCategories createdAt',
-        })
+        .populate({ path: 'submission', select: 'overallOutcome triggeredCategories createdAt' })
         .populate({ path: 'reviewedBy', select: 'name email' })
         .sort({ createdAt: -1 })
         .skip(skip)
@@ -57,12 +55,13 @@ export const reviewAppeal = async (req, res, next) => {
     appeal.reviewedAt = new Date();
     await appeal.save();
 
-    // On acceptance override the submission outcome to Approved
+    // On acceptance: override submission + all its verdicts to Approved
     if (status === 'Accepted') {
       await Submission.findByIdAndUpdate(appeal.submission, {
         overallOutcome: 'Approved',
         appealEligible: false,
       });
+      await Verdict.updateMany({ submission: appeal.submission }, { outcome: 'Approved' });
     }
 
     await appeal.populate([
