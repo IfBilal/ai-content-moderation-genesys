@@ -1,36 +1,33 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { BarChart2, FileText, AlertTriangle, XCircle, TrendingUp } from 'lucide-react';
+import { FileText, AlertTriangle, XCircle, TrendingUp } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import PageHeader from '../../components/ui/PageHeader';
 import Card, { CardBody, CardHeader } from '../../components/ui/Card';
-import Spinner from '../../components/ui/Spinner';
 import api from '../../lib/api';
 
 const COLORS = { 'Approved': '#22C55E', 'Flagged for Review': '#F59E0B', 'Blocked': '#EF4444' };
 const TAB_OPTIONS = [{ label: '7d', value: 7 }, { label: '30d', value: 30 }, { label: '90d', value: 90 }];
 
-const StatCard = ({ icon: Icon, label, value, color = 'text-white' }) => (
-  <Card hover>
-    <CardBody className="!py-5">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-          <Icon size={15} className="text-zinc-400" />
-        </div>
-        <div>
-          <p className="text-xs text-zinc-500">{label}</p>
-          <p className={`text-xl font-bold tracking-tight ${color}`}>{value ?? '—'}</p>
-        </div>
+const StatCard = ({ icon: Icon, label, value, color = 'white' }) => (
+  <div className="stat-card">
+    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+      <div className="stat-card-icon">
+        <Icon size={16} style={{ color: 'rgba(255,255,255,0.4)' }} />
       </div>
-    </CardBody>
-  </Card>
+      <div>
+        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{label}</p>
+        <p className="stat-card-value" style={{ color }}>{value ?? '—'}</p>
+      </div>
+    </div>
+  </div>
 );
 
 const customTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-[#0a0a0a] border border-white/10 rounded-lg px-3 py-2 text-xs">
-      <p className="text-zinc-400 mb-1">{label}</p>
+    <div style={{ background: '#0f0f18', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '8px 12px', fontSize: 12 }}>
+      <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>{label}</p>
       {payload.map((p, i) => <p key={i} style={{ color: p.color }}>{p.name}: {p.value}</p>)}
     </div>
   );
@@ -62,10 +59,10 @@ const AnalyticsPage = () => {
         title="Analytics"
         subtitle="Platform-wide moderation insights"
         action={
-          <div className="flex bg-white/5 border border-white/10 rounded-lg overflow-hidden">
+          <div className="tab-bar">
             {TAB_OPTIONS.map(t => (
               <button key={t.value} onClick={() => setDays(t.value)}
-                className={`px-4 py-1.5 text-xs font-medium transition-all ${days === t.value ? 'bg-white/10 text-white' : 'text-zinc-500 hover:text-white'}`}>
+                className={`tab-btn ${days === t.value ? 'active' : ''}`}>
                 {t.label}
               </button>
             ))}
@@ -74,41 +71,39 @@ const AnalyticsPage = () => {
       />
 
       {loading ? (
-        <div className="flex justify-center py-20"><Spinner size="lg" /></div>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}><div className="spinner spinner-lg" /></div>
       ) : (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {/* Stat cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
             <StatCard icon={FileText} label="Total Submissions" value={totalSubmissions} />
-            <StatCard icon={AlertTriangle} label="Flagged" value={flagged} color="text-yellow-400" />
-            <StatCard icon={XCircle} label="Blocked" value={blocked} color="text-red-400" />
+            <StatCard icon={AlertTriangle} label="Flagged" value={flagged} color="#fbbf24" />
+            <StatCard icon={XCircle} label="Blocked" value={blocked} color="#f87171" />
             <StatCard icon={TrendingUp} label="Resolution Rate"
               value={data?.appealStats?.resolutionRate != null ? `${data.appealStats.resolutionRate.toFixed(0)}%` : '—'}
-              color="text-blue-400" />
+              color="#818cf8" />
           </div>
 
           {/* Charts grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            {/* Submission volume - full width */}
-            <Card className="lg:col-span-2">
-              <CardHeader><h3 className="text-sm font-semibold text-white">Submission Volume</h3></CardHeader>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>
+            <Card>
+              <CardHeader><h3 style={{ fontSize: 14, fontWeight: 600, color: 'white' }}>Submission Volume</h3></CardHeader>
               <CardBody>
                 {data?.submissionVolume?.length ? (
                   <ResponsiveContainer width="100%" height={200}>
                     <LineChart data={data.submissionVolume}>
-                      <XAxis dataKey="date" tick={{ fill: '#52525B', fontSize: 10 }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fill: '#52525B', fontSize: 10 }} axisLine={false} tickLine={false} />
+                      <XAxis dataKey="date" tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10 }} axisLine={false} tickLine={false} />
                       <Tooltip content={customTooltip} />
-                      <Line type="monotone" dataKey="count" stroke="#3B82F6" strokeWidth={2} dot={false} />
+                      <Line type="monotone" dataKey="count" stroke="#6366f1" strokeWidth={2} dot={false} />
                     </LineChart>
                   </ResponsiveContainer>
-                ) : <p className="text-xs text-zinc-600 text-center py-8">No data for this period</p>}
+                ) : <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '32px 0' }}>No data for this period</p>}
               </CardBody>
             </Card>
 
-            {/* Verdict distribution pie */}
             <Card>
-              <CardHeader><h3 className="text-sm font-semibold text-white">Verdict Distribution</h3></CardHeader>
+              <CardHeader><h3 style={{ fontSize: 14, fontWeight: 600, color: 'white' }}>Verdict Distribution</h3></CardHeader>
               <CardBody>
                 {data?.verdictByOutcome?.length ? (
                   <div>
@@ -122,88 +117,88 @@ const AnalyticsPage = () => {
                         <Tooltip content={customTooltip} />
                       </PieChart>
                     </ResponsiveContainer>
-                    <div className="space-y-1.5 mt-2">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
                       {data.verdictByOutcome.map(v => (
-                        <div key={v.outcome} className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full" style={{ background: COLORS[v.outcome] }} />
-                            <span className="text-xs text-zinc-400">{v.outcome}</span>
+                        <div key={v.outcome} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: COLORS[v.outcome] }} />
+                            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{v.outcome}</span>
                           </div>
-                          <span className="text-xs text-zinc-300 font-medium">{v.count}</span>
+                          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>{v.count}</span>
                         </div>
                       ))}
                     </div>
                   </div>
-                ) : <p className="text-xs text-zinc-600 text-center py-8">No data</p>}
+                ) : <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '32px 0' }}>No data</p>}
               </CardBody>
             </Card>
           </div>
 
           {/* Category breakdown + appeal stats */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             <Card>
-              <CardHeader><h3 className="text-sm font-semibold text-white">Top Triggered Categories</h3></CardHeader>
+              <CardHeader><h3 style={{ fontSize: 14, fontWeight: 600, color: 'white' }}>Top Triggered Categories</h3></CardHeader>
               <CardBody>
                 {data?.verdictByCategory?.length ? (
                   <ResponsiveContainer width="100%" height={220}>
                     <BarChart data={data.verdictByCategory} layout="vertical">
-                      <XAxis type="number" tick={{ fill: '#52525B', fontSize: 10 }} axisLine={false} tickLine={false} />
-                      <YAxis dataKey="category" type="category" width={140} tick={{ fill: '#A1A1AA', fontSize: 10 }} axisLine={false} tickLine={false} />
+                      <XAxis type="number" tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10 }} axisLine={false} tickLine={false} />
+                      <YAxis dataKey="category" type="category" width={140} tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 10 }} axisLine={false} tickLine={false} />
                       <Tooltip content={customTooltip} />
-                      <Bar dataKey="count" fill="#3B82F6" radius={[0, 4, 4, 0]} />
+                      <Bar dataKey="count" fill="#6366f1" radius={[0, 4, 4, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
-                ) : <p className="text-xs text-zinc-600 text-center py-8">No violations in this period</p>}
+                ) : <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '32px 0' }}>No violations in this period</p>}
               </CardBody>
             </Card>
 
             <Card>
-              <CardHeader><h3 className="text-sm font-semibold text-white">Appeal Stats</h3></CardHeader>
+              <CardHeader><h3 style={{ fontSize: 14, fontWeight: 600, color: 'white' }}>Appeal Stats</h3></CardHeader>
               <CardBody>
                 {data?.appealStats ? (
-                  <div className="space-y-4">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                     {[
-                      { label: 'Total Appeals', value: data.appealStats.total, color: 'text-white' },
-                      { label: 'Pending', value: data.appealStats.pending, color: 'text-indigo-400' },
-                      { label: 'Accepted', value: data.appealStats.accepted, color: 'text-green-400' },
-                      { label: 'Rejected', value: data.appealStats.rejected, color: 'text-red-400' },
-                      { label: 'Resolution Rate', value: `${data.appealStats.resolutionRate?.toFixed(1)}%`, color: 'text-blue-400' },
+                      { label: 'Total Appeals', value: data.appealStats.total, color: 'white' },
+                      { label: 'Pending', value: data.appealStats.pending, color: '#a5b4fc' },
+                      { label: 'Accepted', value: data.appealStats.accepted, color: '#4ade80' },
+                      { label: 'Rejected', value: data.appealStats.rejected, color: '#f87171' },
+                      { label: 'Resolution Rate', value: `${data.appealStats.resolutionRate?.toFixed(1)}%`, color: '#818cf8' },
                     ].map(({ label, value, color }) => (
-                      <div key={label} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
-                        <span className="text-xs text-zinc-500">{label}</span>
-                        <span className={`text-sm font-semibold ${color}`}>{value}</span>
+                      <div key={label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{label}</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color }}>{value}</span>
                       </div>
                     ))}
                   </div>
-                ) : <p className="text-xs text-zinc-600 text-center py-8">No appeal data</p>}
+                ) : <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '32px 0' }}>No appeal data</p>}
               </CardBody>
             </Card>
           </div>
 
           {/* User rankings */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
             {[
               { title: 'Top Users by Submissions', data: data?.topUsersBySubmissions, key: 'submissionCount', label: 'Submissions' },
               { title: 'Top Users by Violations', data: data?.topUsersByViolations, key: 'violationCount', label: 'Violations' },
             ].map(({ title, data: rows, key, label }) => (
               <Card key={title}>
-                <CardHeader><h3 className="text-sm font-semibold text-white">{title}</h3></CardHeader>
-                <CardBody className="!p-0">
+                <CardHeader><h3 style={{ fontSize: 14, fontWeight: 600, color: 'white' }}>{title}</h3></CardHeader>
+                <CardBody className="!p-0" style={{ padding: 0 }}>
                   {rows?.length ? (
-                    <div className="divide-y divide-white/5">
+                    <div className="divide-subtle">
                       {rows.map((r, i) => (
-                        <div key={i} className="flex items-center gap-3 px-6 py-3">
-                          <span className="text-xs text-zinc-700 w-5">{i + 1}</span>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium text-white truncate">{r.name}</p>
-                            <p className="text-[10px] text-zinc-600 truncate">{r.email}</p>
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 24px' }}>
+                          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)', width: 20 }}>{i + 1}</span>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontSize: 12, fontWeight: 500, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.name}</p>
+                            <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.email}</p>
                           </div>
-                          <span className="text-sm font-semibold text-white">{r[key]}</span>
-                          <span className="text-[10px] text-zinc-600">{label}</span>
+                          <span style={{ fontSize: 14, fontWeight: 600, color: 'white' }}>{r[key]}</span>
+                          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>{label}</span>
                         </div>
                       ))}
                     </div>
-                  ) : <p className="text-xs text-zinc-600 text-center py-6">No data</p>}
+                  ) : <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '24px 0' }}>No data</p>}
                 </CardBody>
               </Card>
             ))}

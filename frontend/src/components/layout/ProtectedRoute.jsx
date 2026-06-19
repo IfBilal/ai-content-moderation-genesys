@@ -1,14 +1,13 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import Spinner from '../ui/Spinner';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-black">
-        <Spinner size="lg" />
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#06060b' }}>
+        <div className="spinner spinner-lg" />
       </div>
     );
   }

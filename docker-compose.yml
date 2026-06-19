@@ -6,6 +6,12 @@ services:
       - mongo_data:/data/db
     ports:
       - "27018:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
   backend:
     build: ./backend
@@ -18,7 +24,8 @@ services:
       - /app/node_modules
       - uploads_data:/app/uploads
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
 
   frontend:
     build: ./frontend

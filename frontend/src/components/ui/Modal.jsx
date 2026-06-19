@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 
 const Modal = ({ open, onClose, title, children, size = 'md' }) => {
-  const sizes = { sm: 'max-w-md', md: 'max-w-lg', lg: 'max-w-2xl' };
+  const sizes = { sm: '448px', md: '520px', lg: '640px' };
 
   return (
     <AnimatePresence>
@@ -11,29 +11,32 @@ const Modal = ({ open, onClose, title, children, size = 'md' }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="modal-overlay"
         >
-          <div
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            onClick={onClose}
-          />
+          <div className="modal-backdrop" onClick={onClose} />
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-            className={`relative w-full ${sizes[size]} bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl`}
+            className="modal-content"
+            style={{ maxWidth: sizes[size] }}
           >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-              <h3 className="text-sm font-semibold text-white tracking-tight">{title}</h3>
+            <div className="modal-header">
+              <h3 style={{ fontSize: 14, fontWeight: 600, color: 'white', letterSpacing: '-0.01em' }}>{title}</h3>
               <button
                 onClick={onClose}
-                className="text-zinc-500 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/5"
+                style={{
+                  background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)',
+                  cursor: 'pointer', padding: 4, borderRadius: 8, transition: 'color 0.2s'
+                }}
+                onMouseEnter={e => e.target.style.color = 'white'}
+                onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.4)'}
               >
                 <X size={16} />
               </button>
             </div>
-            <div className="px-6 py-5">{children}</div>
+            <div className="modal-body">{children}</div>
           </motion.div>
         </motion.div>
       )}

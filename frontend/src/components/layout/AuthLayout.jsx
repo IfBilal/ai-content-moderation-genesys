@@ -9,15 +9,15 @@ const AuthLayout = ({ children }) => (
       transition={{ duration: 0.7, ease: 'easeOut' }}
       className="relative z-10 w-full max-w-md"
     >
-      <div className="flex flex-col items-center mb-8">
-        <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4">
-          <ShieldCheck size={20} className="text-blue-400" />
+      <div className="auth-logo-wrap">
+        <div className="auth-logo-box">
+          <ShieldCheck size={22} />
         </div>
-        <span className="text-xs font-semibold tracking-[0.2em] text-zinc-500 uppercase">
+        <span className="auth-logo-label">
           Content Moderation
         </span>
       </div>
-      <div className="bg-[#050505] border border-white/10 rounded-2xl p-8">
+      <div className="auth-card">
         {children}
       </div>
     </motion.div>

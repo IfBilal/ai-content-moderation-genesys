@@ -1,42 +1,22 @@
-import { cn } from '../../lib/utils';
-
-const Input = ({ label, error, className, ...props }) => (
-  <div className="flex flex-col gap-1.5">
-    {label && (
-      <label className="text-xs font-medium text-zinc-400 uppercase tracking-widest">
-        {label}
-      </label>
-    )}
+const Input = ({ label, error, className = '', ...props }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+    {label && <label className="form-label">{label}</label>}
     <input
-      className={cn(
-        'w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder-zinc-600 outline-none transition-all duration-200',
-        'focus:border-white/25 focus:ring-1 focus:ring-blue-500/30',
-        error && 'border-red-500/50 focus:border-red-500/50 focus:ring-red-500/20',
-        className
-      )}
+      className={`form-input ${error ? 'error' : ''} ${className}`}
       {...props}
     />
-    {error && <p className="text-xs text-red-400">{error}</p>}
+    {error && <p className="form-error">{error}</p>}
   </div>
 );
 
-export const Textarea = ({ label, error, className, ...props }) => (
-  <div className="flex flex-col gap-1.5">
-    {label && (
-      <label className="text-xs font-medium text-zinc-400 uppercase tracking-widest">
-        {label}
-      </label>
-    )}
+export const Textarea = ({ label, error, className = '', ...props }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+    {label && <label className="form-label">{label}</label>}
     <textarea
-      className={cn(
-        'w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white placeholder-zinc-600 outline-none transition-all duration-200 resize-none',
-        'focus:border-white/25 focus:ring-1 focus:ring-blue-500/30',
-        error && 'border-red-500/50',
-        className
-      )}
+      className={`form-input form-textarea ${error ? 'error' : ''} ${className}`}
       {...props}
     />
-    {error && <p className="text-xs text-red-400">{error}</p>}
+    {error && <p className="form-error">{error}</p>}
   </div>
 );
 

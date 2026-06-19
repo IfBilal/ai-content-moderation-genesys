@@ -14,19 +14,19 @@ export const truncate = (str, n = 20) =>
 
 export const outcomeColor = (outcome) => {
   const map = {
-    'Approved': 'text-green-400 bg-green-500/10 border-green-500/20',
-    'Flagged for Review': 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',
-    'Blocked': 'text-red-400 bg-red-500/10 border-red-500/20',
-    'Pending': 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
+    'Approved': { background: 'rgba(34,197,94,0.12)', color: '#4ade80', borderColor: 'rgba(34,197,94,0.25)' },
+    'Flagged for Review': { background: 'rgba(245,158,11,0.12)', color: '#fbbf24', borderColor: 'rgba(245,158,11,0.25)' },
+    'Blocked': { background: 'rgba(239,68,68,0.12)', color: '#f87171', borderColor: 'rgba(239,68,68,0.25)' },
+    'Pending': { background: 'rgba(99,102,241,0.12)', color: '#a5b4fc', borderColor: 'rgba(99,102,241,0.25)' },
   };
-  return map[outcome] || 'text-zinc-400 bg-zinc-500/10 border-zinc-500/20';
+  return map[outcome] || { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', borderColor: 'rgba(255,255,255,0.08)' };
 };
 
 export const appealStatusColor = (status) => {
   const map = {
-    'Pending': 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20',
-    'Accepted': 'text-green-400 bg-green-500/10 border-green-500/20',
-    'Rejected': 'text-red-400 bg-red-500/10 border-red-500/20',
+    'Pending': { background: 'rgba(99,102,241,0.12)', color: '#a5b4fc', borderColor: 'rgba(99,102,241,0.25)' },
+    'Accepted': { background: 'rgba(34,197,94,0.12)', color: '#4ade80', borderColor: 'rgba(34,197,94,0.25)' },
+    'Rejected': { background: 'rgba(239,68,68,0.12)', color: '#f87171', borderColor: 'rgba(239,68,68,0.25)' },
   };
-  return map[status] || 'text-zinc-400 bg-zinc-500/10 border-zinc-500/20';
+  return map[status] || { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', borderColor: 'rgba(255,255,255,0.08)' };
 };

@@ -17,7 +17,11 @@ export const getAppeals = async (req, res, next) => {
     const [appeals, total] = await Promise.all([
       Appeal.find(filter)
         .populate({ path: 'user', select: 'name email' })
-        .populate({ path: 'submission', select: 'overallOutcome triggeredCategories createdAt' })
+        .populate({
+          path: 'submission',
+          select: 'overallOutcome triggeredCategories createdAt images',
+          populate: { path: 'images', select: 'filename originalName' },
+        })
         .populate({ path: 'reviewedBy', select: 'name email' })
         .sort({ createdAt: -1 })
         .skip(skip)

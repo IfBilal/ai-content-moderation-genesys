@@ -1,16 +1,19 @@
-import { cn, outcomeColor, appealStatusColor } from '../../lib/utils';
+import { outcomeColor, appealStatusColor } from '../../lib/utils';
 
-const Badge = ({ children, variant, className }) => {
-  const colorClass = variant
-    ? variant === 'outcome' ? outcomeColor(children) : appealStatusColor(children)
-    : 'text-zinc-400 bg-zinc-500/10 border-zinc-500/20';
+const Badge = ({ children, variant, className = '' }) => {
+  const getStyle = () => {
+    if (variant === 'outcome') return outcomeColor(children);
+    if (variant === 'appeal') return appealStatusColor(children);
+    return { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', borderColor: 'rgba(255,255,255,0.08)' };
+  };
+
+  const style = getStyle();
 
   return (
-    <span className={cn(
-      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border tracking-wide',
-      colorClass,
-      className
-    )}>
+    <span
+      className={`badge ${className}`}
+      style={style}
+    >
       {children}
     </span>
   );

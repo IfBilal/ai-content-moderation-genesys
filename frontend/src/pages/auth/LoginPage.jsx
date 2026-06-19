@@ -47,13 +47,13 @@ const LoginPage = () => {
 
   return (
     <AuthLayout>
-      <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-5">
-        <motion.div variants={item} className="text-center mb-6">
-          <h1 className="text-xl font-bold text-white tracking-tight">Sign in</h1>
-          <p className="text-sm text-zinc-500 mt-1">Access your moderation dashboard</p>
+      <motion.div variants={stagger} initial="hidden" animate="visible" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <motion.div variants={item} style={{ textAlign: 'center', marginBottom: 8 }}>
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: 'white', letterSpacing: '-0.02em' }}>Sign in</h1>
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginTop: 6 }}>Access your moderation dashboard</p>
         </motion.div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <motion.div variants={item}>
             <Input
               label="Email"
@@ -75,15 +75,15 @@ const LoginPage = () => {
             />
           </motion.div>
           <motion.div variants={item}>
-            <Button type="submit" loading={loading} className="w-full mt-2" size="lg">
+            <Button type="submit" loading={loading} style={{ width: '100%', marginTop: 8 }} size="lg">
               Sign in
             </Button>
           </motion.div>
         </form>
 
-        <motion.p variants={item} className="text-center text-sm text-zinc-600">
+        <motion.p variants={item} style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.35)' }}>
           Don&apos;t have an account?{' '}
-          <Link to="/register" className="text-blue-400 hover:text-blue-300 transition-colors">
+          <Link to="/register" style={{ color: '#818cf8', textDecoration: 'none', transition: 'color 0.2s' }}>
             Create one
           </Link>
         </motion.p>

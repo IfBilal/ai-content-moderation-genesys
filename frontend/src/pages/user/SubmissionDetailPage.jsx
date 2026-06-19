@@ -7,18 +7,17 @@ import Card, { CardBody, CardHeader } from '../../components/ui/Card';
 import { OutcomeBadge, AppealBadge } from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import { Textarea } from '../../components/ui/Input';
-import Spinner from '../../components/ui/Spinner';
 import api from '../../lib/api';
 import toast from 'react-hot-toast';
 import { formatDate } from '../../lib/utils';
 
 const ConfidenceBar = ({ value, triggered }) => (
-  <div className="flex items-center gap-2">
-    <div className="w-24 h-1.5 bg-white/10 rounded-full overflow-hidden">
-      <div className={`h-full rounded-full transition-all ${triggered ? 'bg-red-500' : value > 50 ? 'bg-yellow-500' : 'bg-green-500'}`}
-        style={{ width: `${value}%` }} />
+  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <div className="confidence-bar-track">
+      <div className="confidence-bar-fill"
+        style={{ width: `${value}%`, background: triggered ? '#ef4444' : value > 50 ? '#eab308' : '#22c55e' }} />
     </div>
-    <span className="text-xs text-zinc-500 w-8">{value}%</span>
+    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', width: 28 }}>{value}%</span>
   </div>
 );
 
@@ -53,19 +52,19 @@ const SubmissionDetailPage = () => {
     } finally { setAppealLoading(false); }
   };
 
-  if (loading) return <div className="flex justify-center py-20"><Spinner size="lg" /></div>;
-  if (!data) return <div className="text-zinc-500 text-sm text-center py-20">Submission not found.</div>;
+  if (loading) return <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}><div className="spinner spinner-lg" /></div>;
+  if (!data) return <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, textAlign: 'center', padding: '80px 0' }}>Submission not found.</div>;
 
   const { submission, verdicts, appeal } = data;
   const policySnapshot = verdicts[0]?.policySnapshot || [];
 
   return (
     <div>
-      <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate('/submissions')} className="text-zinc-500 hover:text-white transition-colors">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+        <button onClick={() => navigate('/submissions')} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', padding: 4 }}>
           <ArrowLeft size={18} />
         </button>
-        <div className="flex-1">
+        <div style={{ flex: 1 }}>
           <PageHeader
             title="Submission Detail"
             subtitle={`ID: ${id.slice(-8).toUpperCase()} · ${formatDate(submission.createdAt)}`}
@@ -75,41 +74,41 @@ const SubmissionDetailPage = () => {
       </div>
 
       {/* Per-image verdicts */}
-      <div className="space-y-4 mb-6">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
         {verdicts.map((v, i) => (
           <motion.div key={v._id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}>
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-white">Image {i + 1}</span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 14, fontWeight: 500, color: 'white' }}>Image {i + 1}</span>
                   <OutcomeBadge outcome={v.outcome} />
                 </div>
               </CardHeader>
               <CardBody>
-                <table className="w-full">
+                <table className="mod-table">
                   <thead>
                     <tr>
                       {['Category','Detected','Confidence','Triggered','Reasoning'].map(h => (
-                        <th key={h} className="text-left text-[10px] font-semibold text-zinc-600 uppercase tracking-widest pb-3 pr-4">{h}</th>
+                        <th key={h}>{h}</th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody>
                     {v.categoryBreakdown.map((c, j) => (
-                      <tr key={j}>
-                        <td className="py-2.5 pr-4 text-xs text-zinc-300 whitespace-nowrap">{c.category}</td>
-                        <td className="py-2.5 pr-4">
+                      <tr key={j} style={{ cursor: 'default' }}>
+                        <td style={{ color: 'rgba(255,255,255,0.7)', whiteSpace: 'nowrap', fontSize: 12 }}>{c.category}</td>
+                        <td>
                           {c.detected
-                            ? <CheckCircle size={14} className="text-red-400" />
-                            : <MinusCircle size={14} className="text-zinc-700" />}
+                            ? <CheckCircle size={14} style={{ color: '#f87171' }} />
+                            : <MinusCircle size={14} style={{ color: 'rgba(255,255,255,0.15)' }} />}
                         </td>
-                        <td className="py-2.5 pr-4"><ConfidenceBar value={c.confidence} triggered={c.triggered} /></td>
-                        <td className="py-2.5 pr-4">
+                        <td><ConfidenceBar value={c.confidence} triggered={c.triggered} /></td>
+                        <td>
                           {c.triggered
-                            ? <XCircle size={13} className="text-red-400" />
-                            : <span className="text-zinc-700 text-xs">—</span>}
+                            ? <XCircle size={13} style={{ color: '#f87171' }} />
+                            : <span style={{ color: 'rgba(255,255,255,0.15)', fontSize: 12 }}>—</span>}
                         </td>
-                        <td className="py-2.5 text-xs text-zinc-500 italic max-w-xs">{c.reasoning}</td>
+                        <td style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', maxWidth: 280 }}>{c.reasoning}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -122,35 +121,33 @@ const SubmissionDetailPage = () => {
 
       {/* Policy snapshot toggle */}
       {policySnapshot.length > 0 && (
-        <Card className="mb-6">
+        <Card style={{ marginBottom: 24 }}>
           <button onClick={() => setShowPolicy(!showPolicy)}
-            className="w-full flex items-center justify-between px-6 py-4 text-sm font-medium text-zinc-400 hover:text-white transition-colors">
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 24px', fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.5)', background: 'none', border: 'none', cursor: 'pointer' }}>
             <span>Policy Config at Submission Time</span>
             {showPolicy ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
           </button>
           <AnimatePresence>
             {showPolicy && (
               <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-                <div className="px-6 pb-5 border-t border-white/10">
-                  <table className="w-full mt-4">
+                exit={{ opacity: 0, height: 0 }} style={{ overflow: 'hidden' }}>
+                <div style={{ padding: '0 24px 20px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                  <table className="mod-table" style={{ marginTop: 16 }}>
                     <thead>
                       <tr>
                         {['Category','Enabled','Threshold','Enforcement'].map(h => (
-                          <th key={h} className="text-left text-[10px] font-semibold text-zinc-600 uppercase tracking-widest pb-3 pr-4">{h}</th>
+                          <th key={h}>{h}</th>
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5">
+                    <tbody>
                       {policySnapshot.map((p, i) => (
-                        <tr key={i}>
-                          <td className="py-2 pr-4 text-xs text-zinc-300">{p.category}</td>
-                          <td className="py-2 pr-4">
-                            <span className={`text-xs ${p.enabled ? 'text-green-400' : 'text-zinc-600'}`}>{p.enabled ? 'Yes' : 'No'}</span>
-                          </td>
-                          <td className="py-2 pr-4 text-xs text-zinc-400">{p.confidenceThreshold}%</td>
-                          <td className="py-2 text-xs">
-                            <span className={p.enforcementBehavior === 'Auto-Block' ? 'text-red-400' : 'text-yellow-400'}>
+                        <tr key={i} style={{ cursor: 'default' }}>
+                          <td style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>{p.category}</td>
+                          <td><span style={{ fontSize: 12, color: p.enabled ? '#4ade80' : 'rgba(255,255,255,0.3)' }}>{p.enabled ? 'Yes' : 'No'}</span></td>
+                          <td style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{p.confidenceThreshold}%</td>
+                          <td style={{ fontSize: 12 }}>
+                            <span style={{ color: p.enforcementBehavior === 'Auto-Block' ? '#f87171' : '#fbbf24' }}>
                               {p.enforcementBehavior}
                             </span>
                           </td>
@@ -168,34 +165,34 @@ const SubmissionDetailPage = () => {
       {/* Appeal section */}
       <Card>
         <CardHeader>
-          <h3 className="text-sm font-semibold text-white">Appeal</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: 'white' }}>Appeal</h3>
         </CardHeader>
         <CardBody>
           {submission.overallOutcome === 'Approved' ? (
-            <p className="text-sm text-zinc-600">This submission was approved. No appeal is necessary.</p>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)' }}>This submission was approved. No appeal is necessary.</p>
           ) : appeal ? (
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-zinc-500">Status</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Status</span>
                 <AppealBadge status={appeal.status} />
               </div>
               <div>
-                <p className="text-xs text-zinc-500 mb-1">Your justification</p>
-                <p className="text-sm text-zinc-300 bg-white/3 border border-white/8 rounded-lg px-3 py-2">{appeal.justification}</p>
+                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Your justification</p>
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: '8px 12px' }}>{appeal.justification}</p>
               </div>
               {appeal.adminResponse && (
                 <div>
-                  <p className="text-xs text-zinc-500 mb-1">Admin response</p>
-                  <p className="text-sm text-zinc-300 bg-white/3 border border-white/8 rounded-lg px-3 py-2 italic">{appeal.adminResponse}</p>
+                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Admin response</p>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: '8px 12px', fontStyle: 'italic' }}>{appeal.adminResponse}</p>
                 </div>
               )}
               {appeal.reviewedAt && (
-                <p className="text-xs text-zinc-600">Reviewed {formatDate(appeal.reviewedAt)}{appeal.reviewedBy ? ` by ${appeal.reviewedBy.name}` : ''}</p>
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>Reviewed {formatDate(appeal.reviewedAt)}{appeal.reviewedBy ? ` by ${appeal.reviewedBy.name}` : ''}</p>
               )}
             </div>
           ) : submission.appealEligible ? (
-            <div className="space-y-3">
-              <p className="text-sm text-zinc-500">You can appeal this decision. Explain why you believe the verdict is incorrect.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>You can appeal this decision. Explain why you believe the verdict is incorrect.</p>
               <Textarea
                 label="Justification"
                 placeholder="Explain why this content should not be flagged or blocked..."
@@ -206,7 +203,7 @@ const SubmissionDetailPage = () => {
               <Button onClick={submitAppeal} loading={appealLoading}>Submit Appeal</Button>
             </div>
           ) : (
-            <p className="text-sm text-zinc-600">This submission is not eligible for appeal.</p>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)' }}>This submission is not eligible for appeal.</p>
           )}
         </CardBody>
       </Card>

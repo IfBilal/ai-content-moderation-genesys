@@ -43,12 +43,12 @@ const RegisterPage = () => {
 
   return (
     <AuthLayout>
-      <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-5">
-        <motion.div variants={item} className="text-center mb-6">
-          <h1 className="text-xl font-bold text-white tracking-tight">Create account</h1>
-          <p className="text-sm text-zinc-500 mt-1">Start moderating content with AI</p>
+      <motion.div variants={stagger} initial="hidden" animate="visible" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <motion.div variants={item} style={{ textAlign: 'center', marginBottom: 8 }}>
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: 'white', letterSpacing: '-0.02em' }}>Create account</h1>
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginTop: 6 }}>Start moderating content with AI</p>
         </motion.div>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <motion.div variants={item}>
             <Input label="Full Name" type="text" placeholder="John Doe" value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })} error={errors.name} />
@@ -62,12 +62,12 @@ const RegisterPage = () => {
               onChange={(e) => setForm({ ...form, password: e.target.value })} error={errors.password} />
           </motion.div>
           <motion.div variants={item}>
-            <Button type="submit" loading={loading} className="w-full mt-2" size="lg">Create Account</Button>
+            <Button type="submit" loading={loading} style={{ width: '100%', marginTop: 8 }} size="lg">Create Account</Button>
           </motion.div>
         </form>
-        <motion.p variants={item} className="text-center text-sm text-zinc-600">
+        <motion.p variants={item} style={{ textAlign: 'center', fontSize: 13, color: 'rgba(255,255,255,0.35)' }}>
           Already have an account?{' '}
-          <Link to="/login" className="text-blue-400 hover:text-blue-300 transition-colors">Sign in</Link>
+          <Link to="/login" style={{ color: '#818cf8', textDecoration: 'none' }}>Sign in</Link>
         </motion.p>
       </motion.div>
     </AuthLayout>

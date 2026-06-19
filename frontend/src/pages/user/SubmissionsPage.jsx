@@ -6,7 +6,6 @@ import PageHeader from '../../components/ui/PageHeader';
 import Card, { CardBody } from '../../components/ui/Card';
 import { OutcomeBadge, AppealBadge } from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
-import Spinner from '../../components/ui/Spinner';
 import api from '../../lib/api';
 import { formatDate } from '../../lib/utils';
 
@@ -44,24 +43,24 @@ const SubmissionsPage = () => {
       <PageHeader title="My Submissions" subtitle={`${pagination.total} total submissions`} />
 
       {/* Filters */}
-      <Card className="mb-6">
-        <CardBody className="!py-4">
-          <div className="flex items-center gap-3 flex-wrap">
-            <Filter size={14} className="text-zinc-500" />
+      <Card style={{ marginBottom: 24 }}>
+        <CardBody>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <Filter size={14} style={{ color: 'rgba(255,255,255,0.35)' }} />
             <select value={filters.outcome} onChange={e => setFilters({ ...filters, outcome: e.target.value })}
-              className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white outline-none">
+              className="form-input" style={{ width: 'auto', padding: '6px 28px 6px 12px', fontSize: 12 }}>
               <option value="">All Outcomes</option>
               {OUTCOMES.map(o => <option key={o} value={o}>{o}</option>)}
             </select>
             <select value={filters.category} onChange={e => setFilters({ ...filters, category: e.target.value })}
-              className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white outline-none">
+              className="form-input" style={{ width: 'auto', padding: '6px 28px 6px 12px', fontSize: 12 }}>
               <option value="">All Categories</option>
               {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
             <input type="date" value={filters.startDate} onChange={e => setFilters({ ...filters, startDate: e.target.value })}
-              className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-400 outline-none" />
+              className="form-input" style={{ width: 'auto', padding: '6px 12px', fontSize: 12, colorScheme: 'dark' }} />
             <input type="date" value={filters.endDate} onChange={e => setFilters({ ...filters, endDate: e.target.value })}
-              className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-zinc-400 outline-none" />
+              className="form-input" style={{ width: 'auto', padding: '6px 12px', fontSize: 12, colorScheme: 'dark' }} />
             <Button size="sm" onClick={applyFilters}>Apply</Button>
             <Button size="sm" variant="ghost" onClick={clearFilters}>Clear</Button>
           </div>
@@ -70,41 +69,40 @@ const SubmissionsPage = () => {
 
       {/* Table */}
       {loading ? (
-        <div className="flex justify-center py-16"><Spinner size="lg" /></div>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '64px 0' }}><div className="spinner spinner-lg" /></div>
       ) : submissions.length === 0 ? (
-        <Card><CardBody><p className="text-sm text-zinc-600 text-center py-8">No submissions found.</p></CardBody></Card>
+        <Card><CardBody><p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '32px 0' }}>No submissions found.</p></CardBody></Card>
       ) : (
         <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div style={{ overflowX: 'auto' }}>
+            <table className="mod-table">
               <thead>
-                <tr className="border-b border-white/10">
+                <tr>
                   {['Date','Images','Outcome','Categories','Appeal',''].map(h => (
-                    <th key={h} className="px-6 py-3 text-left text-[10px] font-semibold text-zinc-600 uppercase tracking-widest">{h}</th>
+                    <th key={h}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {submissions.map((s, i) => (
                   <motion.tr key={s._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.04 }}
-                    onClick={() => navigate(`/submissions/${s._id}`)}
-                    className="border-b border-white/5 hover:bg-white/2 cursor-pointer transition-colors">
-                    <td className="px-6 py-4 text-xs text-zinc-400 whitespace-nowrap">{formatDate(s.createdAt)}</td>
-                    <td className="px-6 py-4 text-xs text-zinc-400">{s.images?.length || 0}</td>
-                    <td className="px-6 py-4"><OutcomeBadge outcome={s.overallOutcome} /></td>
-                    <td className="px-6 py-4">
-                      <div className="flex gap-1 flex-wrap max-w-xs">
+                    onClick={() => navigate(`/submissions/${s._id}`)}>
+                    <td style={{ color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap', fontSize: 12 }}>{formatDate(s.createdAt)}</td>
+                    <td style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>{s.images?.length || 0}</td>
+                    <td><OutcomeBadge outcome={s.overallOutcome} /></td>
+                    <td>
+                      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', maxWidth: 260 }}>
                         {s.triggeredCategories?.slice(0, 2).map(c => (
-                          <span key={c} className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 border border-white/8 text-zinc-500">{c}</span>
+                          <span key={c} className="category-chip">{c}</span>
                         ))}
-                        {s.triggeredCategories?.length > 2 && <span className="text-[10px] text-zinc-600">+{s.triggeredCategories.length - 2}</span>}
-                        {!s.triggeredCategories?.length && <span className="text-xs text-zinc-700">—</span>}
+                        {s.triggeredCategories?.length > 2 && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>+{s.triggeredCategories.length - 2}</span>}
+                        {!s.triggeredCategories?.length && <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.15)' }}>—</span>}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      {s.appealStatus ? <AppealBadge status={s.appealStatus} /> : <span className="text-xs text-zinc-700">—</span>}
+                    <td>
+                      {s.appealStatus ? <AppealBadge status={s.appealStatus} /> : <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.15)' }}>—</span>}
                     </td>
-                    <td className="px-6 py-4"><ArrowRight size={13} className="text-zinc-700" /></td>
+                    <td><ArrowRight size={13} style={{ color: 'rgba(255,255,255,0.15)' }} /></td>
                   </motion.tr>
                 ))}
               </tbody>
@@ -112,9 +110,9 @@ const SubmissionsPage = () => {
           </div>
           {/* Pagination */}
           {pagination.pages > 1 && (
-            <div className="flex items-center justify-between px-6 py-4 border-t border-white/10">
-              <span className="text-xs text-zinc-600">Page {pagination.page} of {pagination.pages}</span>
-              <div className="flex gap-2">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 24px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>Page {pagination.page} of {pagination.pages}</span>
+              <div style={{ display: 'flex', gap: 8 }}>
                 <Button size="sm" variant="secondary" disabled={pagination.page === 1}
                   onClick={() => fetchSubmissions(applied, pagination.page - 1)}>
                   <ChevronLeft size={13} />

@@ -6,7 +6,6 @@ import PageHeader from '../../components/ui/PageHeader';
 import Card, { CardBody } from '../../components/ui/Card';
 import { OutcomeBadge } from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
-import Spinner from '../../components/ui/Spinner';
 import api from '../../lib/api';
 import { formatDate } from '../../lib/utils';
 
@@ -36,62 +35,60 @@ const AdminSubmissionsPage = () => {
     <div>
       <PageHeader title="Submissions Queue" subtitle={`${pagination.total} submissions`} />
 
-      {/* Filter tabs */}
-      <div className="flex gap-1 mb-6 bg-white/3 border border-white/10 rounded-xl p-1 w-fit">
+      <div className="tab-bar" style={{ marginBottom: 24 }}>
         {OUTCOMES.map(o => (
           <button key={o} onClick={() => changeOutcome(o)}
-            className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${outcome === o ? 'bg-white/10 text-white' : 'text-zinc-500 hover:text-white'}`}>
+            className={`tab-btn ${outcome === o ? 'active' : ''}`}>
             {o === 'all' ? 'All' : o}
           </button>
         ))}
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-16"><Spinner size="lg" /></div>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '64px 0' }}><div className="spinner spinner-lg" /></div>
       ) : submissions.length === 0 ? (
-        <Card><CardBody><p className="text-sm text-zinc-600 text-center py-8">No submissions found.</p></CardBody></Card>
+        <Card><CardBody><p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '32px 0' }}>No submissions found.</p></CardBody></Card>
       ) : (
         <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div style={{ overflowX: 'auto' }}>
+            <table className="mod-table">
               <thead>
-                <tr className="border-b border-white/10">
+                <tr>
                   {['Date','User','Images','Outcome','Categories',''].map(h => (
-                    <th key={h} className="px-6 py-3 text-left text-[10px] font-semibold text-zinc-600 uppercase tracking-widest">{h}</th>
+                    <th key={h}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {submissions.map((s, i) => (
                   <motion.tr key={s._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.04 }}
-                    onClick={() => navigate(`/admin/submissions/${s._id}`)}
-                    className="border-b border-white/5 hover:bg-white/2 cursor-pointer transition-colors">
-                    <td className="px-6 py-4 text-xs text-zinc-400 whitespace-nowrap">{formatDate(s.createdAt)}</td>
-                    <td className="px-6 py-4">
-                      <p className="text-xs text-white font-medium">{s.user?.name}</p>
-                      <p className="text-[10px] text-zinc-600">{s.user?.email}</p>
+                    onClick={() => navigate(`/admin/submissions/${s._id}`)}>
+                    <td style={{ color: 'rgba(255,255,255,0.5)', whiteSpace: 'nowrap', fontSize: 12 }}>{formatDate(s.createdAt)}</td>
+                    <td>
+                      <p style={{ fontSize: 12, fontWeight: 500, color: 'white' }}>{s.user?.name}</p>
+                      <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>{s.user?.email}</p>
                     </td>
-                    <td className="px-6 py-4 text-xs text-zinc-400">{s.images?.length || 0}</td>
-                    <td className="px-6 py-4"><OutcomeBadge outcome={s.overallOutcome} /></td>
-                    <td className="px-6 py-4">
-                      <div className="flex gap-1 flex-wrap">
+                    <td style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>{s.images?.length || 0}</td>
+                    <td><OutcomeBadge outcome={s.overallOutcome} /></td>
+                    <td>
+                      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                         {s.triggeredCategories?.slice(0, 2).map(c => (
-                          <span key={c} className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 border border-white/8 text-zinc-500">{c}</span>
+                          <span key={c} className="category-chip">{c}</span>
                         ))}
-                        {s.triggeredCategories?.length > 2 && <span className="text-[10px] text-zinc-600">+{s.triggeredCategories.length - 2}</span>}
-                        {!s.triggeredCategories?.length && <span className="text-xs text-zinc-700">—</span>}
+                        {s.triggeredCategories?.length > 2 && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>+{s.triggeredCategories.length - 2}</span>}
+                        {!s.triggeredCategories?.length && <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.15)' }}>—</span>}
                       </div>
                     </td>
-                    <td className="px-6 py-4"><ArrowRight size={13} className="text-zinc-700" /></td>
+                    <td><ArrowRight size={13} style={{ color: 'rgba(255,255,255,0.15)' }} /></td>
                   </motion.tr>
                 ))}
               </tbody>
             </table>
           </div>
           {pagination.pages > 1 && (
-            <div className="flex items-center justify-between px-6 py-4 border-t border-white/10">
-              <span className="text-xs text-zinc-600">Page {pagination.page} of {pagination.pages}</span>
-              <div className="flex gap-2">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 24px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>Page {pagination.page} of {pagination.pages}</span>
+              <div style={{ display: 'flex', gap: 8 }}>
                 <Button size="sm" variant="secondary" disabled={pagination.page === 1}
                   onClick={() => fetchSubmissions(outcome, pagination.page - 1)}><ChevronLeft size={13} /></Button>
                 <Button size="sm" variant="secondary" disabled={pagination.page === pagination.pages}
